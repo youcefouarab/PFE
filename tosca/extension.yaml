@@ -1,0 +1,286 @@
+tosca_definitions_version: tosca_2_0
+  
+node_types:
+
+  NetworkApplication:
+    derived_from: tosca.nodes.Root
+    properties:
+      cos:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ mission_critical, realtime, interactive, conversational, streaming_audio, streaming_video, cpu_bound, best_effort ]
+    capabilities:
+      application:
+        type: Application
+    requirements:
+      - host:
+          capability: MyCompute
+          node: HostNode
+          relationship: HostableOn
+          occurrences: [ 0, 1 ]
+      - link:
+          capability: Link
+          node: Link
+          relationship: LinkableTo
+          occurrences: [ 0, UNBOUNDED ]
+      - availability:
+          capability: Availability
+      - hScalability:
+          capability: HorizontalScalability
+      - vScalability:
+          capability: VerticalScalability
+
+  HostNode:
+    derived_from: tosca.nodes.Compute
+    properties:
+      type:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ cloud, fog ]
+      status:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ up, down, busy ]
+      load:
+        type: NodeLoad
+        required: false
+      mobile:
+        type: boolean
+        required: false
+      location:
+        type: Location
+        required: false
+    capabilities:
+      host:
+        type: MyCompute
+        valid_source_types: [ NetworkApplication ]
+      availability:
+        type: Availability
+      hScalability:
+        type: HorizontalScalability
+      vScalability:
+        type: VerticalScalability
+
+  Link:
+    derived_from: tosca.nodes.network.Port
+    properties:
+      status:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ up, down ]
+      load:
+        type: LinkLoad
+        required: false
+    capabilities:
+      link:
+        type: Link
+        valid_source_types: [ NetworkApplication ]
+
+relationship_types:
+
+  HostableOn:
+    derived_from: tosca.relationships.Root
+    valid_target_types: [ HostNode ]
+
+  LinkableTo:
+    derived_from: tosca.relationships.Root
+    valid_target_types: [ Link ]
+
+capability_types:
+
+  Application:
+    derived_from: tosca.capabilities.Root
+    properties:
+      response_time:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0 ms
+      reliability:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ low, medium, high ]
+      ccu:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 0
+      rps:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 0
+
+  Link:
+    derived_from: tosca.capabilities.Root
+    properties:
+      bandwidth:
+        type: scalar-unit.bitrate
+        required: false
+        constraints:
+          - greater_or_equal: 0 Mbps
+      latency:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0 ms
+      jitter:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0 ms
+      loss_rate:
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      error_rate:
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      mtu:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 0
+
+  MyCompute:
+    derived_from: tosca.capabilities.Compute
+    properties:
+      mips:
+        type: float
+        required: false
+        constraints:
+          - greater_or_equal: 0
+      cpi:
+        type: float
+        required: false
+        constraints:
+          - greater_or_equal: 0
+      swap_size:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      io_rate:
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      iops:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 0
+
+  Availability:
+    derived_from: tosca.capabilities.Root
+    properties:
+      availability:
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      mtbf:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0
+      mttr:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0
+
+  HorizontalScalability:
+    derived_from: tosca.capabilities.Scalable
+
+  VerticalScalability:
+    derived_from: tosca.capabilities.Root
+    properties:
+      min_cpus:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 1
+      max_cpus:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 1
+      min_frequency:
+        type: scalar-unit.frequency
+        required: false
+        constraints:
+          - greater_or_equal: 0.1 GHz
+      max_frequency:
+        type: scalar-unit.frequency
+        required: false
+        constraints:
+          - greater_or_equal: 0.1 GHz
+      min_disk:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      max_disk:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      min_mem:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      max_mem:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+
+data_types:
+
+  NodeLoad:
+    derived_from: tosca.datatypes.Root
+    properties:
+      cpu_load: 
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      ram_load: 
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      disk_load: 
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      swap_load: 
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+      io_load: 
+        type: float
+        required: false
+        constraints:
+          - in_range: [ 0, 100 ]
+
+  LinkLoad:
+    derived_from: tosca.datatypes.Root
+    properties:
+      bandwidth_load: 
+        type: scalar-unit.bitrate
+        required: false
+        constraints:
+          - greater_or_equal: 0 Mbps
