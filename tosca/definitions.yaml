@@ -1,5 +1,5 @@
 
-tosca_definitions_version: tosca_2_0
+tosca_definitions_version: tosca_simple_yaml_1_3
   
 
 node_types:
@@ -8,12 +8,43 @@ node_types:
     derived_from: tosca.nodes.Root
     properties:
       cos:
-        type: CoSType
+        type: string
         required: false
-    capabilities:
-      application:
-        type: Application
+        constraints:
+          - valid_values: [ mission_critical, realtime, interactive, conversational, streaming_audio, streaming_video, cpu_bound, best_effort ]
+      request_size:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      response_size:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      request_type:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ MEM_BOUND, CPU_BOUND ]
+      worker_mem:
+        type: scalar-unit.size
+        required: false
+        constraints:
+          - greater_or_equal: 0 MB
+      click_frequency:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0 ms
+      instructs_per_task:
+        type: integer
+        required: false
+        constraints:
+          - greater_or_equal: 0
     requirements:
+      - application:
+          capability: Application
       - host:
           capability: MyCompute
           node: HostNode
@@ -24,30 +55,28 @@ node_types:
           node: Link
           relationship: LinkableTo
           occurrences: [ 0, UNBOUNDED ]
-      - availability:
-          capability: Availability
-      - hScalability:
-          capability: HorizontalScalability
-      - vScalability:
-          capability: VerticalScalability
 
   HostNode:
     derived_from: tosca.nodes.Compute
     properties:
-      type:
-        type: NodeType
+      env:
+        type: string
         required: false
+        constraints:
+          - valid_values: [ cloud, fog ]
       status:
-        type: NodeStatusType
+        type: string
         required: false
+        constraints:
+          - valid_values: [ up, down, busy ]
       load:
-        type: NodeLoadType
+        type: NodeLoad
         required: false
       mobile:
         type: boolean
         required: false
       location:
-        type: LocationType
+        type: Location
         required: false
     capabilities:
       host:
@@ -64,10 +93,12 @@ node_types:
     derived_from: tosca.nodes.network.Port
     properties:
       status:
-        type: LinkStatusType
+        type: string
         required: false
+        constraints:
+          - valid_values: [ up, down, busy ]
       load:
-        type: LinkLoadType
+        type: LinkLoad
         required: false
     capabilities:
       link:
@@ -79,7 +110,7 @@ relationship_types:
 
   HostableOn:
     derived_from: tosca.relationships.Root
-    valid_target_types: [ HostNode ]
+    valid_target_types: [ MyCompute ]
 
   LinkableTo:
     derived_from: tosca.relationships.Root
@@ -96,19 +127,27 @@ capability_types:
         required: false
         constraints:
           - greater_or_equal: 0 ms
+      compute_time:
+        type: scalar-unit.time
+        required: false
+        constraints:
+          - greater_or_equal: 0 ms
       reliability:
-        type: ReliabilityType
+        type: Reliability
         required: false
-      ccu:
+      concurrent_users:
         type: integer
         required: false
         constraints:
           - greater_or_equal: 0
-      rps:
+      requests_per_second:
         type: integer
         required: false
         constraints:
           - greater_or_equal: 0
+      hardware:
+        type: Hardware
+        required: false
 
   Link:
     derived_from: tosca.capabilities.Root
@@ -132,12 +171,12 @@ capability_types:
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       error_rate:
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       mtu:
         type: integer
         required: false
@@ -180,7 +219,7 @@ capability_types:
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       mtbf:
         type: scalar-unit.time
         required: false
@@ -242,54 +281,36 @@ capability_types:
 
 data_types:
 
-  CoSType:
-    derived_from: tosca.datatypes.Root
-    properties:
-      class:
-        type: string
-        required: false
-        constraints:
-          - valid_values: [ mission_critical, realtime, interactive, conversational, streaming_audio, streaming_video, cpu_bound, best_effort ]
-
-  NodeType:
-    derived_from: tosca.datatypes.Root
-    properties:
-      type:
-        type: string
-        required: false
-        constraints:
-          - valid_values: [ cloud, fog ]
-
-  NodeLoadType:
+  NodeLoad:
     derived_from: tosca.datatypes.Root
     properties:
       cpu_load: 
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       ram_load: 
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       disk_load: 
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       swap_load: 
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
       io_load: 
         type: float
         required: false
         constraints:
-          - in_range: [ 0, 1 ]
+          - in_range: [ 0.0, 1.0 ]
 
-  LinkLoadType:
+  LinkLoad:
     derived_from: tosca.datatypes.Root
     properties:
       bandwidth_load: 
@@ -297,25 +318,8 @@ data_types:
         required: false
         constraints:
           - greater_or_equal: 0 Mbps
-  
-  NodeStatusType:
-    derived_from: tosca.datatypes.Root
-    properties:
-      type: string
-        required: false
-        constraints:
-          - valid_values: [ up, down, busy ]
 
-  LinkStatusType:
-    derived_from: tosca.datatypes.Root
-    properties:
-      type: string
-        required: false
-        constraints:
-          - valid_values: [ up, down ]
-
-
-  LocationType:
+  Location:
     derived_from: tosca.datatypes.Root
     properties:
       region:
@@ -324,7 +328,7 @@ data_types:
         constraints:
           - valid_values: [ DZ, FR, DE, US_EAST, US_WEST ] # to be extended
 
-  ReliabilityType:
+  Reliability:
     derived_from: tosca.datatypes.Root
     properties:
       level:
@@ -332,3 +336,12 @@ data_types:
         required: false
         constraints:
           - valid_values: [ low, medium, high ]
+  
+  Hardware:
+    derived_from: tosca.datatypes.Root
+    properties:
+      level:
+        type: string
+        required: false
+        constraints:
+          - valid_values: [ very_low, low, medium, high, very_high ]
