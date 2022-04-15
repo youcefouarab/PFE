@@ -10,8 +10,8 @@ topology_template:
       type: NetworkApplication
       properties:
         cos: cpu_bound
-        #request_size: 2 MB
-        #response_size: 2 MB
+        request_size: 2 MB
+        response_size: 2 MB
         request_type: MEM_BOUND
         worker_mem: 40 MB
         click_frequency: 40 s
@@ -41,10 +41,11 @@ topology_template:
                       - disk_size: { greater_or_equal: 240 GB }
               properties:
                 - env: { equal: cloud }
-        #- link:
-         #   node_filter:
-          #    capabilities:
-           #     - link:
-            #        properties:
-                      #- bandwidth: { greater_or_equal: 1 Gbps }
-                      #- latency: { less_or_equal: 100 ms }
+        - link:
+            node_filter:
+              capabilities:
+                - link:
+                    properties:
+                      - bandwidth: { greater_or_equal: 1 Gbps }
+                      - latency: { less_or_equal: 100 ms }
+                      - loss_rate: { less_or_equal: 0.001 }

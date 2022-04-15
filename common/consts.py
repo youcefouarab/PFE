@@ -12,10 +12,14 @@ ERR_10 = "Error: Sum of latency and compute time cannot be larger than response 
 ERR_11 = "Error: Not enough info to translate number of requests per second."
 ERR_12 = "Error: Not enough info to translate number of concurrent users."
 ERR_13 = "Error: Not enough info to translate compute time."
+ERR_14 = "Error: Node type must be HostNode."
+ERR_15 = "Error: Host parsing is impossible."
 
 WARN_1 = "Warning: Certain application properties are not defined. This could impact the result."
 WARN_2 = "Warning: Certain application requirements are not defined. This could impact the result."
 WARN_3 = "Warning: As per your configuration, latency is negligible against bandwidth."
 WARN_4 = "Warning: As per your configuration, bandwidth is negligible against latency."
+WARN_5 = "Warning: Certain host properties are not defined. This could impact the result."
+WARN_6 = "Warning: Certain host capabilities are not defined. This could impact the result."
 
 NEGLIGIBLE = 0

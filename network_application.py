@@ -9,11 +9,13 @@ from mapping.hardware_mapping import hardware_mapping
 class network_application :
 
     def __init__(self, template_path):
-        self.app = self.properties = self.requirements = {}
+        self.app = {} ; self.properties = {} ; self.requirements = {}
+        self.name = ""
         with open(template_path) as f:
             dict = yaml.load(f, Loader=yaml.FullLoader)
             try :
-                self.app = dict['topology_template']['node_templates'][list(dict['topology_template']['node_templates'])[0]]
+                self.name = list(dict['topology_template']['node_templates'])[0]
+                self.app = dict['topology_template']['node_templates'][self.name]
                 if (self.app['type'] != 'NetworkApplication') :
                     print(ERR_2)
                     return

@@ -1,0 +1,44 @@
+
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - definitions.yaml
+
+topology_template:
+  node_templates:
+    host_1:
+      type: HostNode
+      properties:
+        env: fog
+        status: down
+      capabilities:
+        host:
+          properties:
+            mem_size: 2 GB
+        availability:
+          properties:
+            availability: 0.70
+    host_2:
+      type: HostNode
+      properties:
+        env: cloud
+        status: busy
+      capabilities:
+        host:
+          properties:
+            mem_size: 4 GB
+        availability:
+          properties:
+            availability: 0.90
+    host_3:
+      type: HostNode
+      properties:
+        env: cloud
+        status: up
+      capabilities:
+        host:
+          properties:
+            mem_size: 8 GB
+        availability:
+          properties:
+            availability: 0.9999

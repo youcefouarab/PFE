@@ -77,16 +77,22 @@ def read_scalar_unit(str, required_unit) :
     return scalar
 
 
-def read_condition(requirement) :
-    # equal greater_than greater_or_equal less_than less_or_equal in_range
-    condition = scalar_unit = ''
-    if 'equal' in requirement : condition = 'equal' 
-    if 'greater_than' in requirement : condition = 'greater_than'
-    if 'greater_or_equal' in requirement : condition = 'greater_or_equal'
-    if 'less_than' in requirement : condition = 'less_than'
-    if 'less_or_equal' in requirement : condition = 'less_or_equal'
-    if 'in_range' in requirement : condition = 'in_range'
-    return { 'condition' : condition, 'scalar-unit' : requirement[condition] }
+def check_condition(requirement, capability) :
+    # TODO check conditions equal greater_than greater_or_equal less_than less_or_equal in_range
+    check = False
+    if 'equal' in requirement : 
+        pass 
+    if 'greater_than' in requirement :  
+        pass 
+    if 'greater_or_equal' in requirement :  
+        pass 
+    if 'less_than' in requirement :  
+        pass 
+    if 'less_or_equal' in requirement :  
+        pass 
+    if 'in_range' in requirement :  
+        pass 
+    return check
 
 
 def next_power_of_2(x):  
