@@ -1,16 +1,19 @@
 
-
-
-def read_scalar_unit(str, required_unit) :
+def read_scalar_unit(su, required_unit) :
+     
+    if not isinstance(su, str) : return su
     
     scalar = unit = ''
-    
-    for t in str :
+
+    for t in su :
         if t.isdigit() or t == '.' : scalar += t
         elif len(scalar) > 0 : break
+    
+    if scalar == '' : return su
+    
     scalar = float(scalar)
     
-    for t in str :
+    for t in su :
         if t.isalpha() : unit += t
         elif len(unit) > 0 : break
 
@@ -78,22 +81,40 @@ def read_scalar_unit(str, required_unit) :
 
 
 def check_condition(requirement, capability) :
-    # TODO check conditions equal greater_than greater_or_equal less_than less_or_equal in_range
-    check = False
-    if 'equal' in requirement : 
-        pass 
-    if 'greater_than' in requirement :  
-        pass 
-    if 'greater_or_equal' in requirement :  
-        pass 
-    if 'less_than' in requirement :  
-        pass 
-    if 'less_or_equal' in requirement :  
-        pass 
-    if 'in_range' in requirement :  
-        pass 
-    return check
+    
+    unit = ''
+    if isinstance(capability, str) :
+        for t in capability :
+            if t.isalpha() : unit += t
+            elif len(unit) > 0 : break
+    
+    cap = read_scalar_unit(capability, unit)
+
+    condition = list(requirement)[0]
+    req = requirement[condition]
+    req_1 = req_2 = None
+    
+    if isinstance(req, list) :
+        req_1 = read_scalar_unit(requirement[condition][0], unit)
+        req_2 = read_scalar_unit(requirement[condition][1], unit)
+    else : req = read_scalar_unit(req, unit)
+
+    if 'equal' in requirement :
+        if cap == req : return True
+    if 'greater_than' in requirement :
+        if cap > req : return True
+    if 'greater_or_equal' in requirement :
+        if cap >= req: return True
+    if 'less_than' in requirement :
+        if cap < req : return True
+    if 'less_or_equal' in requirement :
+        if cap <= req : return True
+    if 'in_range' in requirement :
+        if cap >= req_1 and cap <= req_2 : return True
+    
+    return False
 
 
 def next_power_of_2(x):  
     return 1 if x == 0 else 2**(x - 1).bit_length()
+

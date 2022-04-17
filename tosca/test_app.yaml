@@ -41,7 +41,7 @@ topology_template:
                       - disk_size: { greater_or_equal: 240 GB }
               properties:
                 - env: { equal: cloud }
-        - link:
+        - network:
             node_filter:
               capabilities:
                 - link:

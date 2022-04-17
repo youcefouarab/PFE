@@ -50,7 +50,7 @@ node_types:
           node: HostNode
           relationship: HostableOn
           occurrences: [ 0, 1 ]
-      - link:
+      - network:
           capability: Link
           node: Link
           relationship: LinkableTo
@@ -100,10 +100,22 @@ node_types:
       load:
         type: LinkLoad
         required: false
+    requirements:
+      - link:
+          capability: tosca.capabilities.network.Linkable
+          relationship: tosca.relationships.network.LinksTo
+          occurrences: [0, 2]
+      - binding:
+          capability: tosca.capabilities.network.Bindable
+          relationship: tosca.relationships.network.BindsTo
+          occurrences: [0, 2]
     capabilities:
       link:
         type: Link
         valid_source_types: [ NetworkApplication ]
+  
+  NetworkNode:
+    derived_from: tosca.nodes.network.Network
 
 
 relationship_types:

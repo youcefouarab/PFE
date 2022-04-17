@@ -1,5 +1,5 @@
 
-from collections import defaultdict
+from collections import defaultdict, deque
 
 class graph:
 
@@ -10,28 +10,42 @@ class graph:
         self.graph[u].append(v)
         self.graph[v].append(u)
 
-    def select_host_bfs(self, s):
+    def bfs_explore(self, s, nodes):
         visited = [False] * (max(self.graph) + 1)
         queue = []
         queue.append(s)
         visited[s] = True 
         while queue:
             s = queue.pop(0)
-            if s != 0 and self.check_host_requirements():
-                if self.check_link_requirements():
-                    print("Node ", s, " is a possible host")
-                    return s
+            print (nodes[s], end = " ")
             for i in self.graph[s]:
                 if visited[i] == False:
                     queue.append(i)
                     visited[i] = True
-    
-    def check_host_requirements(self):
-        check = False
-        # TODO check host requirements
-        return check
 
-    def check_link_requirements(self):
-        check = False
-        # TODO check link requirements
-        return check
+    def print_path(self, path):
+        size = len(path)
+        for i in range(size):
+            print(path[i], end = " ")
+        print()
+        
+    def find_paths(self, src, dst):
+        q = deque()
+        paths = []
+        path = []
+        path.append(src)
+        q.append(path.copy())
+        while q:
+            path = q.popleft()
+            last = path[len(path) - 1]
+            if last == dst:
+                self.print_path(path)
+                paths.append(path)
+            for i in range(len(self.graph[last])):
+                if self.graph[last][i] not in path:
+                    newpath = path.copy()
+                    newpath.append(self.graph[last][i])
+                    q.append(newpath)
+        return paths
+
+    
