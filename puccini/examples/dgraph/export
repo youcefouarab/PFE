@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink -f "$0")")
+
+function c () {
+	curl "http://localhost:8080/$1?commitNow=true" \
+		--header "Content-Type: application/$2" \
+		--request POST \
+		--data-binary "$3" \
+		--silent | python -m json.tool
+}
+
+puccini-tosca compile "$HERE/../tosca/requirements-and-capabilities.yaml" --exec="$HERE/dgraph.js" --output="$HERE/tosca.json"
+
+c alter json '{"drop_all": true}'
+c mutate json @"$HERE/tosca.json"
+c query dql '{
+ nodeTemplates(func: has(tosca.name)) {
+   tosca.name
+ }
+}'

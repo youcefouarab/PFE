@@ -1,0 +1,8 @@
+- name: TOSCA hosts
+  hosts: myservice # matches the service name in "tosca.yaml"
+  gather_facts: no
+  tasks:
+
+  - name: Show hosts
+    debug:
+      msg: "host: {{ inventory_hostname }}, groups: {{ group_names | join(', ') }}"

@@ -9,7 +9,7 @@ topology_template:
     host_1:
       type: HostNode
       properties:
-        env: fog
+        type: fog
         status: down
       capabilities:
         host:
@@ -21,20 +21,19 @@ topology_template:
     host_2:
       type: HostNode
       properties:
-        env: cloud
-        status: busy
+        type: cloud
+        status: up
       capabilities:
         host:
           properties:
             mem_size: 4 GB
-            num_cpus: 4
         availability:
           properties:
             availability: 0.90
     host_3:
       type: HostNode
       properties:
-        env: cloud
+        type: cloud
         status: up
       capabilities:
         host:
@@ -43,15 +42,17 @@ topology_template:
         availability:
           properties:
             availability: 0.9999
-    network_1:
+    router_a:
       type: NetworkNode
-    network_2:
+    router_b:
       type: NetworkNode
     link_1:
       type: Link
+      properties:
+        status: up
       requirements:
-        - link: network_1
-        - binding: host_1
+        - link: host_1
+        - link: router_a
       capabilities:
         link:
           properties:
@@ -59,41 +60,49 @@ topology_template:
             latency: 10 ms
     link_2:
       type: Link
+      properties:
+        status: up
       requirements:
-        - link: network_1
-        - binding: host_2
+        - link: host_2
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 20 ms
+    link_3:
+      type: Link
+      properties:
+        status: up
+      requirements:
+        - link: host_3
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 20 ms
+    link_4:
+      type: Link
+      properties:
+        status: up
+      requirements:
+        - link: router_a
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 5 ms
+    link_5:
+      type: Link
+      properties:
+        status: up
+      requirements:
+        - link: host_1
+        - link: host_2
       capabilities:
         link:
           properties:
             bandwidth: 500 Mbps
             latency: 20 ms
-    link_3:
-      type: Link
-      requirements:
-        - link: network_2
-        - binding: host_3
-      capabilities:
-        link:
-          properties:
-            bandwidth: 1 Gbps
-            latency: 50 ms
-    link_4:
-      type: Link
-      requirements:
-        - link: network_1
-        - link: network_2
-      capabilities:
-        link:
-          properties:
-            bandwidth: 1 Gbps
-            latency: 50 ms
-    link_5:
-      type: Link
-      requirements:
-        - binding: host_1
-        - binding: host_2
-      capabilities:
-        link:
-          properties:
-            bandwidth: 1 Gbps
-            latency: 50 ms

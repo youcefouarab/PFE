@@ -21,5 +21,6 @@ WARN_3 = "Warning: As per your configuration, latency is negligible against band
 WARN_4 = "Warning: As per your configuration, bandwidth is negligible against latency."
 WARN_5 = "Warning: Certain host properties are not defined. This could impact the result."
 WARN_6 = "Warning: Certain host capabilities are not defined. This could impact the result."
+WARN_7 = "Warning: Certain link capabilities are not defined. This could impact the result."
 
 NEGLIGIBLE = 0

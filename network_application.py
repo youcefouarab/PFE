@@ -172,8 +172,8 @@ class network_application :
                     loss = reliability_mapping[niv]['loss_rate']
                 else :
                     if 'cos' in self.app_properties :
-                        loss = cos_mapping[self.app_properties['cos']]['loss_rate']
-                        error = cos_mapping[self.app_properties['cos']]['error_rate']
+                        if 'loss_rate' in cos_mapping[self.app_properties['cos']] : loss = cos_mapping[self.app_properties['cos']]['loss_rate']
+                        if 'error_rate' in cos_mapping[self.app_properties['cos']] : error = cos_mapping[self.app_properties['cos']]['error_rate']
                     else :
                         print(ERR_4)
                         return

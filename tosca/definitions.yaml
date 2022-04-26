@@ -26,7 +26,7 @@ node_types:
         type: string
         required: false
         constraints:
-          - valid_values: [ MEM_BOUND, CPU_BOUND ]
+          - valid_values: [ IO_BOUND, CPU_BOUND ]
       worker_mem:
         type: scalar-unit.size
         required: false
@@ -59,7 +59,7 @@ node_types:
   HostNode:
     derived_from: tosca.nodes.Compute
     properties:
-      env:
+      type:
         type: string
         required: false
         constraints:
@@ -70,13 +70,13 @@ node_types:
         constraints:
           - valid_values: [ up, down, busy ]
       load:
-        type: NodeLoad
+        type: NodeLoadType
         required: false
       mobile:
         type: boolean
         required: false
       location:
-        type: Location
+        type: LocationType
         required: false
     capabilities:
       host:
@@ -88,26 +88,24 @@ node_types:
         type: HorizontalScalability
       vScalability:
         type: VerticalScalability
+      linkable:
+        type: tosca.capabilities.network.Linkable
 
   Link:
-    derived_from: tosca.nodes.network.Port
+    derived_from: tosca.nodes.Root
     properties:
       status:
         type: string
         required: false
         constraints:
-          - valid_values: [ up, down, busy ]
+          - valid_values: [ up, down ]
       load:
-        type: LinkLoad
+        type: LinkLoadType
         required: false
     requirements:
       - link:
           capability: tosca.capabilities.network.Linkable
           relationship: tosca.relationships.network.LinksTo
-          occurrences: [0, 2]
-      - binding:
-          capability: tosca.capabilities.network.Bindable
-          relationship: tosca.relationships.network.BindsTo
           occurrences: [0, 2]
     capabilities:
       link:
@@ -115,7 +113,10 @@ node_types:
         valid_source_types: [ NetworkApplication ]
   
   NetworkNode:
-    derived_from: tosca.nodes.network.Network
+    derived_from: tosca.nodes.Root
+    capabilities:
+      linkable:
+        type: tosca.capabilities.network.Linkable
 
 
 relationship_types:
@@ -145,7 +146,7 @@ capability_types:
         constraints:
           - greater_or_equal: 0 ms
       reliability:
-        type: Reliability
+        type: ReliabilityType
         required: false
       concurrent_users:
         type: integer
@@ -158,7 +159,7 @@ capability_types:
         constraints:
           - greater_or_equal: 0
       hardware:
-        type: Hardware
+        type: HardwareType
         required: false
 
   Link:
@@ -293,7 +294,7 @@ capability_types:
 
 data_types:
 
-  NodeLoad:
+  NodeLoadType:
     derived_from: tosca.datatypes.Root
     properties:
       cpu_load: 
@@ -322,7 +323,7 @@ data_types:
         constraints:
           - in_range: [ 0.0, 1.0 ]
 
-  LinkLoad:
+  LinkLoadType:
     derived_from: tosca.datatypes.Root
     properties:
       bandwidth_load: 
@@ -331,7 +332,7 @@ data_types:
         constraints:
           - greater_or_equal: 0 Mbps
 
-  Location:
+  LocationType:
     derived_from: tosca.datatypes.Root
     properties:
       region:
@@ -340,7 +341,7 @@ data_types:
         constraints:
           - valid_values: [ DZ, FR, DE, US_EAST, US_WEST ] # to be extended
 
-  Reliability:
+  ReliabilityType:
     derived_from: tosca.datatypes.Root
     properties:
       level:
@@ -349,7 +350,7 @@ data_types:
         constraints:
           - valid_values: [ low, medium, high ]
   
-  Hardware:
+  HardwareType:
     derived_from: tosca.datatypes.Root
     properties:
       level:

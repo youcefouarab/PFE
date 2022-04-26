@@ -1,0 +1,20 @@
+- name: TOSCA tasks
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+  - name: Compile TOSCA service template
+    puccini.tosca.compile:
+      service_template: ../service.yaml
+      inputs:
+        ram: 1 gib
+    register: service
+
+  - name: Show Compute node templates
+    loop: "{{ service.node_templates }}"
+    loop_control:
+      loop_var: node_template
+      label: "{{ node_template.name }}"
+    when: "'tosca::Abstract.Compute' in node_template.types"
+    debug:
+      msg: "{{ node_template }}"
