@@ -66,6 +66,8 @@ class host_nodes :
         while queue:
             s = queue.popleft()
             if s != src and len(self.capabilities[s]) > 0 and self.check_host_requirements(host_requirements, self.capabilities[s]):
+                # ET SI FIND PATHS VERIFIE LES EXIGENCES ???
+                """
                 paths = self.graph.find_paths(src, s)
                 for path in paths :
                     if self.check_network_requirements(network_requirements, path):
@@ -75,6 +77,15 @@ class host_nodes :
                             if (i != src) : print('->', self.nodes[i], end=' ')
                         print()
                         return s, path
+                """
+                path = self.graph.find_path(src, s, network_requirements)
+                if path != None :
+                    print(self.nodes[s], "is a possible host through path:", end=' ')
+                    print(self.nodes[src], end=' ')
+                    for i in path['path'] :
+                        if (i != src) : print('->', self.nodes[i], end=' ')
+                    print()
+                    return s, path
             for i in self.graph.graph[s]:
                 if visited[i] == False:
                     queue.append(i)

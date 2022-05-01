@@ -2,7 +2,7 @@
 from collections import defaultdict, deque
 import math
 
-from common.utils import read_scalar_unit
+from common.utils import check_condition, read_scalar_unit
 
 class graph:
 
@@ -34,15 +34,43 @@ class graph:
                     q.append(newpath)
         return paths
 
+    def find_path(self, src, dst, req):
+        q = deque()
+        path = []
+        path.append(src)
+        q.append(path.copy())
+        while q:
+            path = q.popleft()
+            last = path[len(path) - 1]
+            if last == dst:
+                p = {'path':path,'weight':self.path_weight(path)}
+                if self.check_network_requirements(req, p):
+                    return p
+            for i in range(len(self.graph[last])):
+                if self.graph[last][i] not in path:
+                    newpath = path.copy()
+                    newpath.append(self.graph[last][i])
+                    q.append(newpath)
+        return None
+
+    def check_network_requirements(self, requirements, path):
+        for req in list(requirements) :
+            if req in path['weight'] :
+                if not check_condition(requirements[req], path['weight'][req]) : return False
+            else :
+                return False
+        return True
+
     def path_weight(self, path) :
         src = path[0]
         latency = 0
         loss_rate = error_rate = 0
         bandwidth = jitter = math.inf
+        # WE COULD ALSO CHECK SERIAL AVAILABILITY HERE !!!
         for i in range(1, len(path)) :
             dst = path[i]
             if 'bandwidth' in self.weights[src][dst] : 
-                bandwidth = min(bandwidth, read_scalar_unit(self.weights[src][dst]['bandwidth']), 'bps')
+                bandwidth = min(bandwidth, read_scalar_unit(self.weights[src][dst]['bandwidth'], 'bps'))
             if 'latency' in self.weights[src][dst] : 
                 latency += read_scalar_unit(self.weights[src][dst]['latency'], 'ms')
             if 'jitter' in self.weights[src][dst] : 
