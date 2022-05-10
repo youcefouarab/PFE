@@ -9,21 +9,20 @@ topology_template:
     game_server:
       type: NetworkApplication
       properties:
-        cos: cpu_bound
-        request_size: 2 MB
-        response_size: 2 MB
-        request_type: MEM_BOUND
-        worker_mem: 40 MB
-        click_frequency: 40 s
+        cos: realtime
+        request_size: 24 kB
+        response_size: 24 kB
+        worker_mem: 45 MB
+        click_frequency: 100 ms
         instructs_per_task: 100
       requirements:
         - application:
             node_filter:
               properties:
-                - response_time: { less_or_equal: 100 ms }
+                - response_time: { less_or_equal: 150 ms }
                 - compute_time: { less_or_equal: 20 ms }
-                - concurrent_users: { greater_or_equal: 300 }
-                - requests_per_second: { greater_or_equal: 140 }
+                - concurrent_users: { greater_or_equal: 100 }
+                - requests_per_second: { greater_or_equal: 3000 }
                 - reliability: { equal: high }
                 - hardware: { equal: high }
         - host:
@@ -35,17 +34,7 @@ topology_template:
                       - mtbf: { greater_or_equal: 20 h } 
                 - host:
                     properties:
-                      - num_cpus: { in_range: [ 4, 8 ] }
                       - cpu_frequency: { greater_or_equal: 3.5 GHz }
-                      - mem_size: { greater_or_equal: 32 GB }
                       - disk_size: { greater_or_equal: 240 GB }
               properties:
                 - env: { equal: cloud }
-        - network:
-            node_filter:
-              capabilities:
-                - link:
-                    properties:
-                      - bandwidth: { greater_or_equal: 1 Gbps }
-                      - latency: { less_or_equal: 100 ms }
-                      - loss_rate: { less_or_equal: 0.001 }

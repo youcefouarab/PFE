@@ -15,24 +15,6 @@ class graph:
         self.graph[v].append(u)
         self.weights[u][v] = c
         self.weights[v][u] = c
-        
-    def find_paths(self, src, dst):
-        q = deque()
-        paths = []
-        path = []
-        path.append(src)
-        q.append(path.copy())
-        while q:
-            path = q.popleft()
-            last = path[len(path) - 1]
-            if last == dst:
-                paths.append({'path':path,'weight':self.path_weight(path)})
-            for i in range(len(self.graph[last])):
-                if self.graph[last][i] not in path:
-                    newpath = path.copy()
-                    newpath.append(self.graph[last][i])
-                    q.append(newpath)
-        return paths
 
     def find_path(self, src, dst, req):
         q = deque()
@@ -63,37 +45,26 @@ class graph:
 
     def path_weight(self, path) :
         src = path[0]
-        latency = 0
-        loss_rate = error_rate = 0
-        bandwidth = jitter = math.inf
-        # WE COULD ALSO CHECK SERIAL AVAILABILITY HERE !!!
+        jitter = latency = 0
+        loss_rate = error_rate = 1
+        bandwidth = math.inf
         for i in range(1, len(path)) :
             dst = path[i]
             if 'bandwidth' in self.weights[src][dst] : 
-                bandwidth = min(bandwidth, read_scalar_unit(self.weights[src][dst]['bandwidth'], 'bps'))
+                bandwidth = min(bandwidth, read_scalar_unit(self.weights[src][dst]['bandwidth'], 'Mbps'))
             if 'latency' in self.weights[src][dst] : 
                 latency += read_scalar_unit(self.weights[src][dst]['latency'], 'ms')
             if 'jitter' in self.weights[src][dst] : 
-                pass
+                jitter = max(jitter, read_scalar_unit(self.weights[src][dst]['jitter'], 'ms'))
             if 'loss_rate' in self.weights[src][dst] : 
-                pass
+                loss_rate *= (1 - self.weights[src][dst]['loss_rate'])
             if 'error_rate' in self.weights[src][dst] : 
-                pass
+                error_rate *= (1 - self.weights[src][dst]['error_rate'])
             src = dst
-        return {'latency':str(latency)+' ms'}
-
-
-"""
-g = graph(5)
-g.add_edge(0, 1, { 'latency' : '11 ms' })
-g.add_edge(0, 3, { 'latency' : '12 ms' })
-g.add_edge(1, 4, { 'latency' : '13 ms' })
-g.add_edge(2, 4, { 'latency' : '14 ms' })
-g.add_edge(3, 4, { 'latency' : '15 ms' })
-
-# {0: [1, 3], 1: [0, 4], 3: [0, 4], 4: [1, 2, 3], 2: [4]}
-
-nodes = ['host_1', 'host_2', 'host_3', 'router_a', 'router_b']
-
-print(g.path_weight([0, 1, 4, 2]))
-"""
+        return {
+            'bandwidth' : str(bandwidth) + ' Mbps', 
+            'latency' : str(latency) + ' ms', 
+            'jitter' : str(jitter) + 'ms',
+            'loss_rate' : 1 - loss_rate,
+            'error_rate' : 1 - error_rate
+        }

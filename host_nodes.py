@@ -9,8 +9,12 @@ from common.graph import graph
 class host_nodes :
 
     def __init__(self, template_path):
-        self.nodes = [] ; self.properties = [] ; self.capabilities = []
+        self.nodes = []
+        self.properties = [] 
+        self.capabilities = []
         self.links = []
+        self.warnings = []
+        self.error = None
         with open(template_path) as f:
             dict = yaml.load(f, Loader=yaml.FullLoader)
             try :
@@ -33,10 +37,11 @@ class host_nodes :
                             for cap in list(node['capabilities']) : c = {**c, **node['capabilities'][cap]['properties']}
                         except : warn_6 = True
                         finally: self.capabilities.append(c) 
-                if warn_5 : print(WARN_5)
-                if warn_6 : print(WARN_6)
+                if warn_5 : self.warnings.append(WARN_5)
+                if warn_6 : self.warnings.append(WARN_6)
             except : 
-                print(ERR_15)
+                self.error = ERR_15
+                return
             self.graph = graph(len(self.nodes))
             try :
                 warn_7 = False
@@ -53,8 +58,10 @@ class host_nodes :
                             for cap in list(node['capabilities']) : c = {**c, **node['capabilities'][cap]['properties']}
                         except : warn_7 = True
                         self.graph.add_edge(self.nodes.index(node_1), self.nodes.index(node_2), c)
-                if warn_7 : print(WARN_7)
-            except : print(ERR_15)
+                if warn_7 : self.warnings.append(WARN_7)
+            except : 
+                self.error = ERR_15
+                return
             
 
     def select_host(self, src, host_requirements, network_requirements):
@@ -66,31 +73,16 @@ class host_nodes :
         while queue:
             s = queue.popleft()
             if s != src and len(self.capabilities[s]) > 0 and self.check_host_requirements(host_requirements, self.capabilities[s]):
-                # ET SI FIND PATHS VERIFIE LES EXIGENCES ???
-                """
-                paths = self.graph.find_paths(src, s)
-                for path in paths :
-                    if self.check_network_requirements(network_requirements, path):
-                        print(self.nodes[s], "is a possible host through path:", end=' ')
-                        print(self.nodes[src], end=' ')
-                        for i in path['path'] :
-                            if (i != src) : print('->', self.nodes[i], end=' ')
-                        print()
-                        return s, path
-                """
                 path = self.graph.find_path(src, s, network_requirements)
                 if path != None :
-                    print(self.nodes[s], "is a possible host through path:", end=' ')
-                    print(self.nodes[src], end=' ')
-                    for i in path['path'] :
-                        if (i != src) : print('->', self.nodes[i], end=' ')
-                    print()
                     return s, path
             for i in self.graph.graph[s]:
                 if visited[i] == False:
                     queue.append(i)
                     visited[i] = True
+        return None, None
     
+
     def check_host_requirements(self, requirements, capabilities):
         for req in list(requirements) :
             if req in capabilities :
@@ -98,38 +90,3 @@ class host_nodes :
             else :
                 return False
         return True
-
-    def check_network_requirements(self, requirements, path):
-        for req in list(requirements) :
-            if req in path['weight'] :
-                if not check_condition(requirements[req], path['weight'][req]) : return False
-            else :
-                return False
-        return True
-
-
-nodes = host_nodes('tosca/test_nodes.yaml')
-
-host_requirements = {
-    'mem_size' : { 'in_range' : [ '4 GB', '8 GB' ] },
-    'availability' : { 'greater_or_equal' : 0.80 }
-}
-
-network_requirements = {
-    'latency' : { 'less_or_equal' : '50 ms' }
-}
-
-nodes.select_host(0, host_requirements, network_requirements)
-
-host_requirements = {
-    'mem_size' : { 'in_range' : [ '4 GB', '8 GB' ] },
-    'availability' : { 'greater_or_equal' : 0.80 },
-    'num_cpus' : { 'in_range' : [ 4, 8 ] }
-}
-
-network_requirements = {
-    'latency' : { 'less_or_equal' : '50 ms' },
-    'bandwidth' : { 'greater_or_equal' : '1 Gbps' }
-}
-
-#nodes.select_host(0, host_requirements, network_requirements)
