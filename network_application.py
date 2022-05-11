@@ -59,8 +59,8 @@ class network_application :
             if warn_2 : self.warnings.append(WARN_2)
 
     def translate_response_time(self) :
-        rt = ct = sa = su = la = lu = t = cos = None ; ccu = rps = 1
-        rt_cond = ct_cond = lat_cond = t_cond = ccu_cond = rps_cond = None
+        rt = ct = sa = su = la = lu = t = cos = None ; ccu = 1
+        rt_cond = ct_cond = lat_cond = t_cond = ccu_cond = None
         if 'compute_time' in self.app_requirements : 
             ct_cond = list(self.app_requirements['compute_time'])[0]
             if ct_cond != 'in_range' :
@@ -104,6 +104,12 @@ class network_application :
                 la = lu = read_scalar_unit(cos_mapping[cos]['latency'], 's') / 2
                 if la + lu >= rt or la + lu + ct >= rt : 
                     la = lu = None
+        if 'bandwidth' in self.network_requirements : 
+            t_cond = list(self.network_requirements['bandwidth'])[0]
+            if t_cond != 'in_range' :
+                t = read_scalar_unit(self.network_requirements['bandwidth'][t_cond], 'Bps')
+            else :
+                t = read_scalar_unit(self.network_requirements['bandwidth'][t_cond][0], 'Bps')
         if 'request_size' in self.app_properties : 
             sa = read_scalar_unit(self.app_properties['request_size'], 'B')
         if 'response_size' in self.app_properties : 
@@ -114,18 +120,6 @@ class network_application :
                 ccu = self.app_requirements['concurrent_users'][ccu_cond]
             else : 
                 ccu = self.app_requirements['concurrent_users'][ccu_cond][0]
-        if 'requests_per_second' in self.app_requirements : 
-            rps_cond = list(self.app_requirements['requests_per_second'])[0]
-            if rps_cond != 'in_range' :
-                rps = self.app_requirements['requests_per_second'][rps_cond]
-            else : 
-                rps = self.app_requirements['requests_per_second'][rps_cond][0]
-        if 'bandwidth' in self.network_requirements : 
-            t_cond = list(self.network_requirements['bandwidth'])[0]
-            if t_cond != 'in_range' :
-                t = read_scalar_unit(self.network_requirements['bandwidth'][t_cond], 'Bps')
-            else :
-                t = read_scalar_unit(self.network_requirements['bandwidth'][t_cond][0], 'Bps')
         try :
             if la != None and lu != None :
                 if t == None :

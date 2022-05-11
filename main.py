@@ -15,14 +15,16 @@ args = parser.parse_args()
 if args.app_template != None : 
     APP_TEMPLATE = args.app_template
 else :
-    # print(ERR_16)
-    APP_TEMPLATE = "tosca/test_app.yaml"
+    print(ERR + ERR_16)
+    exit()
+    # APP_TEMPLATE = "tosca/test_app.yaml"
 
 if args.node_template != None : 
     NODE_TEMPLATE = args.node_template
 else :
-    # print(ERR_17)
-    NODE_TEMPLATE = "tosca/test_nodes.yaml"
+    print(ERR_17)
+    exit()
+    # NODE_TEMPLATE = "tosca/test_nodes.yaml"
 
 print("\nValidating your application template...", end="\t")
 
