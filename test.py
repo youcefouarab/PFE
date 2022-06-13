@@ -185,7 +185,7 @@ if cont.upper() != 'Y':
 
 print("\nParsing node characteristics...", end="\t\t")
 
-NODE_TEMPLATE = "tosca/demo_nodes.yaml"
+NODE_TEMPLATE = "tosca/test_nodes.yaml"
 nodes = host_nodes(NODE_TEMPLATE)
 
 if nodes.error != None :

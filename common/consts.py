@@ -1,5 +1,5 @@
 
-ERR_1 = "Not enough info to translate response time."
+ERR_1 = "Not enough info to interpret response time."
 ERR_2 = "Node type must be NetworkApplication."
 ERR_3 = "Application parsing is impossible."
 ERR_4 = "Not enough info to translate reliability."

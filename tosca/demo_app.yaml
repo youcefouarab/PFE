@@ -10,8 +10,8 @@ topology_template:
       type: NetworkApplication
       properties:
         cos: realtime
-        request_size: 24 kB
-        response_size: 24 kB
+        request_size: 32 kB
+        response_size: 32 kB
         worker_mem: 45 MB
         click_frequency: 100 ms
         instructs_per_task: 100
@@ -19,22 +19,17 @@ topology_template:
         - application:
             node_filter:
               properties:
-                - response_time: { less_or_equal: 150 ms }
+                - response_time: { less_or_equal: 100 ms }
                 - compute_time: { less_or_equal: 20 ms }
                 - concurrent_users: { greater_or_equal: 100 }
                 - requests_per_second: { greater_or_equal: 3000 }
                 - reliability: { equal: high }
-                - hardware: { equal: high }
+                - hardware: { equal: low }
         - host:
             node_filter:
               capabilities: 
                 - availability:
                     properties:
                       - availability: { greater_or_equal: 0.999 }  
-                      - mtbf: { greater_or_equal: 20 h } 
-                - host:
-                    properties:
-                      - cpu_frequency: { greater_or_equal: 3.5 GHz }
-                      - disk_size: { greater_or_equal: 240 GB }
               properties:
                 - env: { equal: cloud }

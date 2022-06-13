@@ -124,10 +124,10 @@ class network_application :
             if la != None and lu != None :
                 if t == None :
                     if sa != None and su != None : 
-                        t = ((sa + su) / (rt - ct - (la + lu))) * ccu
+                        t = ((sa + su) / (rt - ct - (la + lu))) #* ccu
                     else :
                         if cos != None and cos_mapping[cos]['bandwidth'] != None : 
-                            t = read_scalar_unit(cos_mapping[cos]['bandwidth'], 'Bps') * ccu
+                            t = read_scalar_unit(cos_mapping[cos]['bandwidth'], 'Bps') #* ccu
                         else : 
                             t = NEGLIGIBLE
                             self.warnings.append(WARN_4)
@@ -136,21 +136,21 @@ class network_application :
                     la = lu = (rt - ct) / 2
                     if t == None :
                         if cos != None and cos_mapping[cos]['bandwidth'] != None : 
-                            t = read_scalar_unit(cos_mapping[cos]['bandwidth'], 'Bps') * ccu
+                            t = read_scalar_unit(cos_mapping[cos]['bandwidth'], 'Bps') #* ccu
                         else : 
                             t = NEGLIGIBLE
                             self.warnings.append(WARN_4)
                 else :
                     if t == None :
-                        t = ((sa + su) / (rt - ct)) * ccu
+                        t = ((sa + su) / (rt - ct)) #* ccu
                         la = lu = NEGLIGIBLE  
                         self.warnings.append(WARN_3)
                     else : 
                         la = lu = (rt - ct - ((sa + su) / (t / ccu))) / 2
         except Exception as e: 
             self.warnings.append(e)
-        self.network_requirements['latency'] = { 'less_or_equal' : str(read_scalar_unit(str(la + lu) + ' s', 'ms')) + ' ms' }
-        self.network_requirements['bandwidth'] = { 'greater_or_equal' : str(read_scalar_unit(str(t) + ' Bps', 'Mbps')) + ' Mbps' }
+        if la != NEGLIGIBLE : self.network_requirements['latency'] = { 'less_or_equal' : str(read_scalar_unit(str(la + lu) + ' s', 'ms')) + ' ms' }
+        if t != NEGLIGIBLE : self.network_requirements['bandwidth'] = { 'greater_or_equal' : str(read_scalar_unit(str(t) + ' Bps', 'Mbps')) + ' Mbps' }
 
 
     def translate_compute_time(self) :
@@ -180,17 +180,35 @@ class network_application :
     def translate_requests_per_second(self) :
         rps = worker_mem = task_time = req_type = ram = cpus = None
         rps_cond = tt_cond = ram_cond = cpus_cond = None
-        if 'compute_time' in self.app_requirements and 'requests_per_second' in self.app_requirements :
-            tt_cond = list(self.app_requirements['compute_time'])[0]
-            if tt_cond != 'in_range' :
-                task_time = read_scalar_unit(self.app_requirements['compute_time'][tt_cond], 's')
-            else : 
-                task_time = read_scalar_unit(self.app_requirements['compute_time'][tt_cond][1], 's')
+        req_size = res_size = 0
+        
+        if 'requests_per_second' in self.app_requirements:
             rps_cond = list(self.app_requirements['requests_per_second'])[0]
             if rps_cond != 'in_range' :
                 rps = self.app_requirements['requests_per_second'][rps_cond]
             else :
                 rps = self.app_requirements['requests_per_second'][rps_cond][0]
+        else :
+            self.error = ERR_11
+            return
+
+        if 'request_size' in self.app_properties: req_size = read_scalar_unit(self.app_properties['request_size'], 'B')
+        if 'response_size' in self.app_properties: res_size = read_scalar_unit(self.app_properties['response_size'], 'B')
+        bandwidth = read_scalar_unit(str(rps * max(req_size, res_size)) + ' Bps', 'Mbps')
+        if 'bandwidth' in self.network_requirements:
+            bw_cond = list(self.network_requirements['bandwidth'])[0]
+            if bw_cond == 'in_range': old_bw = read_scalar_unit(self.network_requirements['bandwidth'][bw_cond][0], 'Mbps')
+            else: old_bw = read_scalar_unit(self.network_requirements['bandwidth'][bw_cond], 'Mbps')
+            if bandwidth > old_bw: self.network_requirements['bandwidth'] = {'greater_or_equal': str(bandwidth) + ' Mbps'}
+        else:
+            self.network_requirements['bandwidth'] = {'greater_or_equal': str(bandwidth) + ' Mbps'}
+
+        if 'compute_time' in self.app_requirements :
+            tt_cond = list(self.app_requirements['compute_time'])[0]
+            if tt_cond != 'in_range' :
+                task_time = read_scalar_unit(self.app_requirements['compute_time'][tt_cond], 's')
+            else : 
+                task_time = read_scalar_unit(self.app_requirements['compute_time'][tt_cond][1], 's')
         else :
             self.error = ERR_11
             return
@@ -234,7 +252,7 @@ class network_application :
                     if self.host_requirements['num_cpus'][cpus_cond][0] > cpus : 
                         cpus = self.host_requirements['num_cpus'][cpus_cond][0]
             self.host_requirements['num_cpus'] = { 'greater_or_equal' : cpus }
-        
+
 
     def translate_concurrent_users(self) :
         ccu = response_time = click_freq = cpus = None

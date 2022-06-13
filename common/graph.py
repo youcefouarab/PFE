@@ -53,13 +53,13 @@ class graph:
             if 'bandwidth' in self.weights[src][dst] : 
                 bandwidth = min(bandwidth, read_scalar_unit(self.weights[src][dst]['bandwidth'], 'Mbps'))
             if 'latency' in self.weights[src][dst] : 
-                latency += read_scalar_unit(self.weights[src][dst]['latency'], 'ms')
+                latency += read_scalar_unit(self.weights[src][dst]['latency'], 'ms') * 2
             if 'jitter' in self.weights[src][dst] : 
                 jitter = max(jitter, read_scalar_unit(self.weights[src][dst]['jitter'], 'ms'))
             if 'loss_rate' in self.weights[src][dst] : 
-                loss_rate *= (1 - self.weights[src][dst]['loss_rate'])
+                loss_rate *= (1 - self.weights[src][dst]['loss_rate']) * (1 - self.weights[src][dst]['loss_rate'])
             if 'error_rate' in self.weights[src][dst] : 
-                error_rate *= (1 - self.weights[src][dst]['error_rate'])
+                error_rate *= (1 - self.weights[src][dst]['error_rate']) * (1 - self.weights[src][dst]['error_rate'])
             src = dst
         return {
             'bandwidth' : str(bandwidth) + ' Mbps', 

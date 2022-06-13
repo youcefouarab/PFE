@@ -1,0 +1,27 @@
+
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - definitions.yaml
+
+topology_template:
+  node_templates:
+    game_server:
+      type: NetworkApplication
+      properties:
+        cos: realtime
+        request_size: 32 kB
+        response_size: 32 kB
+      requirements:
+        - application:
+            node_filter:
+              properties:
+                - response_time: { less_or_equal: 65 ms }
+                - compute_time: { less_or_equal: 20 ms }
+                - requests_per_second: { greater_or_equal: 20 }
+        - network:
+            node_filter:
+              capabilities:
+                - link:
+                    properties:
+                      - latency: { less_or_equal: 15 ms }

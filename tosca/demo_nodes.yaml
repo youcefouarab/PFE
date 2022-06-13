@@ -1,0 +1,189 @@
+
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+  - definitions.yaml
+
+topology_template:
+  node_templates:
+    host_1:
+      type: HostNode
+      capabilities:
+        host:
+          properties:
+            cpu_frequency: 3.6 GHz
+            num_cpus: 8
+            mem_size: 16 GB
+            disk_size: 1 TB
+            mips: 1.0
+        availability:
+          properties:
+            availability: 0.9999
+            mtbf: 5 d
+    host_2:
+      type: HostNode
+      capabilities:
+        host:
+          properties:
+            cpu_frequency: 3.4 GHz
+            num_cpus: 4
+            mem_size: 4 GB
+            disk_size: 1 TB
+            mips: 1.0
+        availability:
+          properties:
+            availability: 0.99
+            mtbf: 3 d
+    host_3:
+      type: HostNode
+      capabilities:
+        host:
+          properties:
+            cpu_frequency: 3.6 GHz
+            num_cpus: 8
+            mem_size: 16 GB
+            disk_size: 1 TB
+            mips: 1.0
+        availability:
+          properties:
+            availability: 0.9999
+    host_4:
+      type: HostNode
+      capabilities:
+        host:
+          properties:
+            cpu_frequency: 3.6 GHz
+            num_cpus: 8
+            mem_size: 16 GB
+            disk_size: 1 TB
+            mips: 1.0
+        availability:
+          properties:
+            availability: 0.9999
+            mtbf: 5 d
+    host_5:
+      type: HostNode
+      capabilities:
+        host:
+          properties:
+            cpu_frequency: 3.2 GHz
+            num_cpus: 2
+            mem_size: 4 GB
+            disk_size: 500 GB
+            mips: 1.0
+        availability:
+          properties:
+            availability: 0.99
+            mtbf: 36 h
+    router_a:
+      type: NetworkNode
+    router_b:
+      type: NetworkNode
+    link_1:
+      type: Link
+      requirements:
+        - link: host_1
+        - link: router_a
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 10 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_2:
+      type: Link
+      requirements:
+        - link: host_1
+        - link: host_2
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 5 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_3:
+      type: Link
+      requirements:
+        - link: host_1
+        - link: host_3
+      capabilities:
+        link:
+          properties:
+            bandwidth: 500 Mbps
+            latency: 10 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_4:
+      type: Link
+      requirements:
+        - link: router_a
+        - link: host_2
+      capabilities:
+        link:
+          properties:
+            bandwidth: 200 Mbps
+            latency: 5 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_5:
+      type: Link
+      requirements:
+        - link: host_3
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 7 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_6:
+      type: Link
+      requirements:
+        - link: router_a
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 1 Gbps
+            latency: 5 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_7:
+      type: Link
+      requirements:
+        - link: host_4
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 500 Mbps
+            latency: 10 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_8:
+      type: Link
+      requirements:
+        - link: host_5
+        - link: router_b
+      capabilities:
+        link:
+          properties:
+            bandwidth: 500 Mbps
+            latency: 20 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
+    link_9:
+      type: Link
+      requirements:
+        - link: host_4
+        - link: host_5
+      capabilities:
+        link:
+          properties:
+            bandwidth: 500 Mbps
+            latency: 5 ms
+            loss_rate: 0.000001
+            error_rate: 0.000001
